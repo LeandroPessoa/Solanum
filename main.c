@@ -218,7 +218,7 @@ void main(void)
 	
 	System_init();
 	int i = 0;
-	LPM3;--
+	LPM3;
   
 	 while(1)
   {
@@ -251,7 +251,7 @@ void main(void)
     justPiscar();
      break;
      
-   --
+   
  }
  
     /** 
