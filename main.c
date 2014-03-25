@@ -75,6 +75,7 @@ unsigned char bufferFlashC[64] = "----------------------------------------------
  * Buffer os bytes correspondentes a leitura de temperatura obtida.
  * */
 unsigned char bufferTemperatura[2] = "";
+unsigned char bufferAmbiente[2] = "";
 
 /*
  * Variável modo recebe modo de operação corrente, deve se iniciar com CHECARMEMORIA para avaliar se a memoria está cheia.
@@ -290,7 +291,24 @@ void main(void)
     //sendData(0x21);
    
  }
- 
+
+ void lerAmbiente(unsigned char* buffer)
+ {
+   unsigned char cmd = 0x06;
+  int i;
+  unsigned char leitura[3];
+   I2C_ack_polling();
+    I2C_send_data(0x00,&cmd,1,0);
+    I2C_receive_data(0x00,leitura,3);
+    //int temperatura = leitura[BYTE_LOW];
+    //temperatura = temperatura << 8;
+   // temperatura |= leitura[BYTE_HIGH];
+   *buffer = leitura[BYTE_LOW];
+   buffer++;
+   *buffer = leitura[BYTE_HIGH];
+    //sendData(0x21);
+   
+ }
 
 
 /*
@@ -327,22 +345,18 @@ __interrupt void TIMER1_A0_ISR_HOOK(void)
   if(contador == AMOSTRAR)
   {
 lerSensor(bufferTemperatura);
-if(contadorTemperaturas <= 62)
-{
+lerAmbiente(bufferAmbiente);
+
   
 bufferFlashD[contadorTemperaturas] = bufferTemperatura[0];
 bufferFlashD[contadorTemperaturas + 1] = bufferTemperatura[1];
-}
-else
-  {
+bufferFlashC[contadorTemperaturas] = bufferAmbiente[0];
+bufferFlashC[contadorTemperaturas + 1] = bufferAmbiente[1]; 
     
-   bufferFlashC[contadorTemperaturas-64] = bufferTemperatura[0];
-   bufferFlashC[(contadorTemperaturas - 64 )+ 1] = bufferTemperatura[1]; 
-    
-  }
+  
 contadorTemperaturas = contadorTemperaturas + 2;
 
-if(contadorTemperaturas == 128)
+if(contadorTemperaturas == 64)
 {
 
 modo = GRAVAR;
